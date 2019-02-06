@@ -125,6 +125,8 @@ class PostgresqlPreflightValidator < PreflightValidator
         # This is also possible, depending on if they've set up pg_hba
         # by host or user or both. This is OK, since it confirms that we're
         # able to connect to the postgres instance.
+
+      when /.*Invalid Username specified.*/
       else
         # This shouldn't be possible, but we still don't want to dump an
         # unhelpful stack trace on the screen. Let's at least catch it and
@@ -173,7 +175,7 @@ class PostgresqlPreflightValidator < PreflightValidator
     # Make sure we have the access we need.
     # Note on not escaping username: we already connected with the same attribute,
     # so it's safe at this point.
-    r = connection.exec("SELECT rolsuper, rolcreaterole, rolcreatedb FROM pg_roles WHERE rolname='#{cs_pg_attr['db_superuser']}';")
+    r = connection.exec("SELECT rolsuper, rolcreaterole, rolcreatedb FROM pg_roles WHERE rolname='#{cs_pg_attr['db_superuser'].split('@')[0]}';")
     # a super user may not have createrole/createdb flags set, so check for both cases
     unless (r[0]['rolsuper'] == 't') or (r[0]['rolcreaterole'] == 't' and r[0]['rolcreatedb'] == 't')
       fail_with err_CSPG013_not_superuser

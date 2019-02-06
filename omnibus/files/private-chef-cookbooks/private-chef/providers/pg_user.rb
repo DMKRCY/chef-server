@@ -85,7 +85,7 @@ def create_user(connection)
   # To support modifying databases owned by this user, the superuser must
   # have the new user's role.
   if node['private_chef']['postgresql']['external']
-    statements << "GRANT #{new_resource.username} TO \"#{node['private_chef']['postgresql']['db_superuser']}\""
+    statements << "GRANT #{new_resource.username} TO \"#{node['private_chef']['postgresql']['db_superuser'].split('@')[0]}\""
     changes <<  "  Grant role '#{new_resource.username}' to database superuser."
   end
   converge_by changes do
